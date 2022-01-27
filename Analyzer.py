@@ -44,13 +44,16 @@ ExerciseCals = np.array(ExerciseCals)
 # get net calories
 NetCals = FoodCals - ExerciseCals
 
+#CurrentWeight = Weights[-1]
+#CurrentWeight = np.mean(Weights[-5:])
+CurrentWeight = min(Weights[-7:])
 print()
 print("---------- Analyzing "+str(len(DateInts))+" Days of Data ----------")
 print("Starting Weight: "+str(InitWeight)+" lbs")
-print("Current Weight:  "+str(Weights[-1])+" lbs")
+print("Current Weight:  "+str(round(CurrentWeight,1))+" lbs")
 print("Goal Weight:     "+str(GoalWeight)+" lbs")
 print()
-print("Way to go! You're "+str(round(100.0*(InitWeight-Weights[-1])/(InitWeight-GoalWeight),1))+"% of the way to your goal!")
+print("Way to go! You're "+str(round(100.0*(InitWeight-CurrentWeight)/(InitWeight-GoalWeight),1))+"% of the way to your goal!")
 
 print()
 print("Average Daily Calories Eaten (All of 2022): "+str(round(np.mean(FoodCals),1)))
@@ -68,6 +71,11 @@ elif np.mean(NetCals[-7:]) < GoalCals:
     print("Net Calories Below Goal (Past Week): "+str(int(7*GoalCals-np.sum(NetCals[-7:]))))
 print()
 
+TotExerciseCals = np.sum(ExerciseCals)
+print("Total Exercise Calories: "+str(int(TotExerciseCals)))
+print("This is equivalent to burning about "+str(round(TotExerciseCals/3500.0,1))+" lbs of fat. Nicely done!")
+print()
+
 
 # now look at cumulative calories relative to the assumed base metabolic rate
 CumulativeNetCals = []
@@ -79,7 +87,7 @@ for i in range(len(NetCals)):
 # this is essentially the total calorie deficit since starting the diet, so we'll adopt a negative convention
 CumulativeNetCals = -np.array(CumulativeNetCals)
 
-LostWeight = InitWeight-Weights[-1]
+LostWeight = InitWeight-CurrentWeight
 print("Total Calorie Deficit (Assuming "+str(int(BasecCals))+" Cal/Day Base Metabolism): "+str(int(CumulativeNetCals[-1])))
 print("Expected Weight Loss: About "+str(round(CumulativeNetCals[-1]/3500.0,1))+" lbs")
 print("Actual Weight Loss: "+str(round(LostWeight,1))+" lbs")
@@ -157,7 +165,7 @@ dateints_fit = np.linspace(-0.5,max(DateInts)+0.5)
 weights_fit = slr.intercept_ + dateints_fit*slr.coef_[0]
 GoalDays = ( GoalWeight-slr.intercept_ ) / slr.coef_[0]
 
-##actually let's force the intercept to be InitWeight
+#actually let's force the intercept to be InitWeight
 #slr = LinearRegression(copy_X=True, fit_intercept=False)
 ##add the initial point data point from Dec. 31, 2021 manually
 #slr.fit(np.insert(DateInts, 0, 0).reshape(-1,1), np.insert(Weights, 0, InitWeight)-InitWeight)
@@ -210,4 +218,5 @@ plt.gca().yaxis.set_ticks_position("right")
 plt.gca().yaxis.set_label_position("right")
 
 plt.subplots_adjust(left=0.09, bottom=0.065, right=0.935, top=0.975, wspace=0, hspace=0)
+plt.savefig('OutputImage.png',dpi=200)
 plt.show()
