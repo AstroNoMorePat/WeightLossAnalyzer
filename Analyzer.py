@@ -143,10 +143,17 @@ plt.legend(fontsize=10, loc='upper left', frameon=False)
 plt.subplot(2, 2, 3)
 
 x_fit = np.linspace(min(DateInts)-1,max(DateInts)+1)
-plt.plot(x_fit, 1000.0*x_fit, linestyle='-', color='k', linewidth=1.0,label="Daily Calorie Goal")
-
+plt.plot(x_fit, (BasecCals-GoalCals)*x_fit, linestyle='-', color='k', linewidth=1.0,label="Daily Calorie Goal", zorder=50000+1)
 
 plt.bar(DateInts, CumulativeNetCals, color='0.5', width=0.75)
+
+for i in range(len(NetCals)):
+    if CumulativeNetCals[i] >= (i+1)*(BasecCals-GoalCals):
+        plt.scatter(DateInts[i], CumulativeNetCals[i], color='limegreen', s=10, zorder=50000)
+    else:
+        plt.scatter(DateInts[i], CumulativeNetCals[i], color='red', s=10, zorder=50000)
+plt.scatter(DateInts, CumulativeNetCals, color='0.5', s=25, zorder=50000-1)
+
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
 plt.xlabel("                                                                     Days Into 2022", fontsize=14)
@@ -155,7 +162,7 @@ plt.xlim(min(DateInts)-1,max(DateInts)+0.99)
 plt.legend(fontsize=10, loc='upper left', frameon=False)
 
 
-
+'''
 # let's fit a simple linear regression
 slr = LinearRegression(copy_X=True)
 #add the initial point data point from Dec. 31, 2021 manually
@@ -163,15 +170,23 @@ slr.fit(np.insert(DateInts, 0, 0).reshape(-1,1), np.insert(Weights, 0, InitWeigh
 
 dateints_fit = np.linspace(-0.5,max(DateInts)+0.5)
 weights_fit = slr.intercept_ + dateints_fit*slr.coef_[0]
-GoalDays = ( GoalWeight-slr.intercept_ ) / slr.coef_[0]
+GoalDays = ( GoalWeight-slr.intercept_ ) / slr.coef_[0] - max(DateInts)
+
+residuals = np.insert(Weights, 0, InitWeight) - slr.predict(np.insert(DateInts, 0, 0).reshape(-1,1))
+residuals_std = np.std( residuals )
+'''
 
 #actually let's force the intercept to be InitWeight
-#slr = LinearRegression(copy_X=True, fit_intercept=False)
-##add the initial point data point from Dec. 31, 2021 manually
-#slr.fit(np.insert(DateInts, 0, 0).reshape(-1,1), np.insert(Weights, 0, InitWeight)-InitWeight)
-#dateints_fit = np.linspace(-0.5,max(DateInts)+0.5)
-#weights_fit = InitWeight + dateints_fit*slr.coef_[0]
-#GoalDays = ( GoalWeight-InitWeight ) / slr.coef_[0]
+slr = LinearRegression(copy_X=True, fit_intercept=False)
+#add the initial point data point from Dec. 31, 2021 manually
+slr.fit(np.insert(DateInts, 0, 0).reshape(-1,1), np.insert(Weights, 0, InitWeight)-InitWeight)
+dateints_fit = np.linspace(-0.5,max(DateInts)+0.5)
+weights_fit = InitWeight + dateints_fit*slr.coef_[0]
+GoalDays = ( GoalWeight-InitWeight ) / slr.coef_[0] - max(DateInts)
+
+residuals = np.insert(Weights, 0, InitWeight) - slr.predict(np.insert(DateInts, 0, 0).reshape(-1,1)) - InitWeight
+residuals_std = np.std( residuals )
+
 
 print()
 print("So far you have been losing about "+str(round(-slr.coef_[0],2))+" pounds per day ("+str(round(-slr.coef_[0]*7,2))+" pounds per week).")
@@ -203,8 +218,6 @@ plt.legend(fontsize=10, loc='upper right', frameon=False)
 
 plt.subplot(2, 2, 4)
 
-residuals = np.insert(Weights, 0, InitWeight) - slr.predict(np.insert(DateInts, 0, 0).reshape(-1,1))
-residuals_std = np.std( residuals )
 plt.text(max(DateInts), min(residuals), "Scatter $\sigma$ = "+str(round(residuals_std,2))+" lbs",
         ha='right', va='center', fontsize=10)
 
