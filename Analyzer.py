@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import date, timedelta
+from matplotlib.ticker import MaxNLocator
 
 # import the LinearRegression object
 from sklearn.linear_model import LinearRegression
@@ -23,12 +24,17 @@ ExerciseCals = []
 with open("CaloriesData.txt") as f:
     lines = f.readlines()
     for line in lines:
-        if (not "CCC" in line) and (not "Food" in line): #skip header and unfilled entries
-            Weight = float( line.split('    ')[2] )
-            Date = line.split('    ')[0]
+        if (not "WWWWW" in line) and (not "Food" in line): #skip header and unfilled entries
+            Weight = float( line.split()[2].replace('*','') )
+            Date = line.split()[0]
             DateInt = int( line.split('    ')[1] )
-            FoodCal = float( line.split('    ')[3] )
-            ExerciseCal = float( line.split('    ')[4].replace('\n','') )
+            if "CCCC" in line or "EEE" in line:
+                #assume that this incomplete data entry will match the prior averages
+                FoodCal = np.median(np.array( FoodCals ))
+                ExerciseCal = np.median(np.array( ExerciseCals ))
+            else:
+                FoodCal = float( line.split()[3] )
+                ExerciseCal = float( line.split()[4].replace('\n','') )
             Dates.append(Date)
             DateInts.append(DateInt)
             Weights.append(Weight)
@@ -105,8 +111,8 @@ for i in range(len(NetCals)):
         #print(i, NetCals[:i+1])
         NetCals_RollingAvg.append(np.mean(NetCals[:i+1]))
 
-
 plt.figure(figsize=(10,8.0))
+
 plt.subplot(2, 2, 1)
 
 
@@ -117,10 +123,10 @@ for i in range(len(NetCals)):
     else:
         plt.bar(DateInts[i], NetCals[i], color='red')
     if NetCals_RollingAvg[i] <= GoalCals:
-        plt.scatter(DateInts[i], NetCals_RollingAvg[i], color='limegreen', s=10, zorder=50000)
+        plt.scatter(DateInts[i], NetCals_RollingAvg[i], color='limegreen', s=7, zorder=50000)
     else:
-        plt.scatter(DateInts[i], NetCals_RollingAvg[i], color='red', s=10, zorder=50000)
-plt.scatter(DateInts, NetCals_RollingAvg, color='black', s=25, zorder=50000-1)
+        plt.scatter(DateInts[i], NetCals_RollingAvg[i], color='red', s=7, zorder=50000)
+plt.scatter(DateInts, NetCals_RollingAvg, color='black', s=18, zorder=50000-1)
 plt.plot(DateInts, NetCals_RollingAvg, color='black', linestyle='--', linewidth=1.0, zorder=50000-1, label="7-Day Rolling Avg.")
 #if np.mean(NetCals[-7:]) <= GoalCals:
 #    plt.axhline(np.mean(NetCals[-7:]), linestyle=':', color='limegreen', linewidth=1.0, label="Average Calories (Past Week)")
@@ -145,14 +151,14 @@ plt.subplot(2, 2, 3)
 x_fit = np.linspace(min(DateInts)-1,max(DateInts)+1)
 plt.plot(x_fit, (BasecCals-GoalCals)*x_fit, linestyle='-', color='k', linewidth=1.0,label="Daily Calorie Goal", zorder=50000+1)
 
-plt.bar(DateInts, CumulativeNetCals, color='0.5', width=0.75)
+plt.bar(DateInts, CumulativeNetCals, color='0.5')
 
 for i in range(len(NetCals)):
     if CumulativeNetCals[i] >= (i+1)*(BasecCals-GoalCals):
-        plt.scatter(DateInts[i], CumulativeNetCals[i], color='limegreen', s=10, zorder=50000)
+        plt.scatter(DateInts[i], CumulativeNetCals[i], color='limegreen', s=7, zorder=50000)
     else:
-        plt.scatter(DateInts[i], CumulativeNetCals[i], color='red', s=10, zorder=50000)
-plt.scatter(DateInts, CumulativeNetCals, color='0.5', s=25, zorder=50000-1)
+        plt.scatter(DateInts[i], CumulativeNetCals[i], color='red', s=7, zorder=50000)
+plt.scatter(DateInts, CumulativeNetCals, color='0.5', s=18, zorder=50000-1)
 
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
@@ -207,12 +213,14 @@ plt.subplot(2, 2, 2)
 #add the initial point data point from Dec. 31, 2021 manually
 plt.scatter(np.insert(DateInts, 0, 0), np.insert(Weights, 0, InitWeight), color='k', marker='o', s=15)
 plt.plot(dateints_fit, weights_fit, color='k', linestyle='-.', linewidth=1.5, label="Linear Fit")
+#plt.axhline(GoalWeight, linestyle='-', color='gold', linewidth=1.5, label="Goal Weight")
 plt.xticks([],fontsize=10)
 plt.yticks(fontsize=10)
 plt.ylabel("Weight (lbs)", fontsize=14)
 plt.xlim(min(DateInts)-1.5,max(DateInts)+0.5)
 plt.gca().yaxis.set_ticks_position("right")
 plt.gca().yaxis.set_label_position("right")
+plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 plt.legend(fontsize=10, loc='upper right', frameon=False)
 
 
