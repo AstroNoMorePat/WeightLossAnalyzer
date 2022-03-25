@@ -140,7 +140,7 @@ plt.axhline(GoalCals, linestyle='-', color='k', linewidth=1.0,label="Daily Calor
 plt.xticks([],fontsize=10)
 plt.yticks(fontsize=10)
 plt.ylabel("Daily Net Calories", fontsize=14)
-#plt.ylim(0,3750)
+plt.ylim(0,4200)
 plt.xlim(min(DateInts)-1,max(DateInts)+0.99)
 plt.legend(fontsize=10, loc='upper left', frameon=False)
 
