@@ -61,6 +61,16 @@ print("Goal Weight:     "+str(GoalWeight)+" lbs")
 print()
 print("Way to go! You're "+str(round(100.0*(InitWeight-CurrentWeight)/(InitWeight-GoalWeight),1))+"% of the way to your goal!")
 
+loss_rate = (InitWeight-CurrentWeight) / max(DateInts)
+print()
+print("So far you have been losing about "+str(round(loss_rate,2))+" pounds per day ("+str(round(7.0*loss_rate,2))+" pounds per week).")
+
+GoalDays = ( CurrentWeight - GoalWeight ) / loss_rate
+GoalDateObj = date.today() + timedelta(days=GoalDays)
+GoalMonth = GoalDateObj.strftime("%B")
+GoalDay = str(GoalDateObj.day)
+print("If this trend holds, you will reach your goal weight in "+str(int(GoalDays))+" days (on "+GoalMonth+" "+GoalDay+").")
+
 print()
 print("Average Daily Calories Eaten (All of 2022): "+str(round(np.mean(FoodCals),1)))
 print("Average Daily Net Calories (All of 2022): "+str(round(np.mean(NetCals),1)))
@@ -168,7 +178,7 @@ plt.xlim(min(DateInts)-1,max(DateInts)+0.99)
 plt.legend(fontsize=10, loc='upper left', frameon=False)
 
 
-'''
+
 # let's fit a simple linear regression
 slr = LinearRegression(copy_X=True)
 #add the initial point data point from Dec. 31, 2021 manually
@@ -180,8 +190,8 @@ GoalDays = ( GoalWeight-slr.intercept_ ) / slr.coef_[0] - max(DateInts)
 
 residuals = np.insert(Weights, 0, InitWeight) - slr.predict(np.insert(DateInts, 0, 0).reshape(-1,1))
 residuals_std = np.std( residuals )
-'''
 
+'''
 #actually let's force the intercept to be InitWeight
 slr = LinearRegression(copy_X=True, fit_intercept=False)
 #add the initial point data point from Dec. 31, 2021 manually
@@ -192,15 +202,17 @@ GoalDays = ( GoalWeight-InitWeight ) / slr.coef_[0] - max(DateInts)
 
 residuals = np.insert(Weights, 0, InitWeight) - slr.predict(np.insert(DateInts, 0, 0).reshape(-1,1)) - InitWeight
 residuals_std = np.std( residuals )
+'''
 
-
-print()
-print("So far you have been losing about "+str(round(-slr.coef_[0],2))+" pounds per day ("+str(round(-slr.coef_[0]*7,2))+" pounds per week).")
+#print()
+#print("So far you have been losing about "+str(round(-slr.coef_[0],2))+" pounds per day ("+str(round(-slr.coef_[0]*7,2))+" pounds per week).")
 
 GoalDateObj = date.today() + timedelta(days=GoalDays)
 GoalMonth = GoalDateObj.strftime("%B")
 GoalDay = str(GoalDateObj.day)
-print("If this trend holds, you will reach your goal weight in "+str(int(GoalDays))+" days (on "+GoalMonth+" "+GoalDay+").")
+
+print()
+print("Based on an extrapolation of the plotted linear fit, you will reach your goal weight in "+str(int(GoalDays))+" days (on "+GoalMonth+" "+GoalDay+").")
 
 print()
 print("You're doing great! Keep up the good work! :)")
