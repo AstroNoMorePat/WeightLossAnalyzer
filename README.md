@@ -1,8 +1,11 @@
 # Weight Loss Analyzer
 
-Script that leverages user-provided data about daily calorie intake and weigh-ins to provide information about weight loss and baseline metabolism.
+Script that utilizes user-provided data with daily calorie intake and weigh-ins to provide information about weight loss and baseline metabolism.
 
-Sample Terminal Output:
+Plot Output:
+![Sample Weight Loss Plot](https://github.com/AstronomerPat/WeightLossAnalyzer/blob/main/OutputImage.png)
+
+Terminal Output:
 
 ---------- Analyzing 180 Days of Data ----------
 
