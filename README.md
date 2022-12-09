@@ -5,6 +5,7 @@ Script that leverages user-provided data about daily calorie intake and weigh-in
 Sample Terminal Output:
 
 ---------- Analyzing 180 Days of Data ----------
+
 Current Date: June 29, 2022
 
 Starting Weight: 250.0 lbs
