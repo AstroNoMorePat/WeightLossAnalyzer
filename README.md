@@ -14,6 +14,7 @@ Current Weight:  218.0 lbs
 
 Goal Weight:     200.0 lbs
 
+
 Way to go! You're 64.0% of the way to your goal!
 
 Average Daily Calories Eaten (All of 2022): 2136.3
